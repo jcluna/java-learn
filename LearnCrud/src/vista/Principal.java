@@ -4,6 +4,7 @@ import config.Conexion;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class Principal extends javax.swing.JFrame {
@@ -50,10 +51,13 @@ public class Principal extends javax.swing.JFrame {
         setTitle("LearnCRUD - Application"); // NOI18N
         setResizable(false);
 
-        pnlDatos.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos")); // NOI18N
+        pnlDatos.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos"));
         pnlDatos.setName(""); // NOI18N
 
         lblId.setText("ID");
+
+        txtId.setEditable(false);
+        txtId.setEnabled(false);
 
         lblDni.setText("DNI");
 
@@ -96,9 +100,14 @@ public class Principal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pnlOperaciones.setBorder(javax.swing.BorderFactory.createTitledBorder("Operaciones")); // NOI18N
+        pnlOperaciones.setBorder(javax.swing.BorderFactory.createTitledBorder("Operaciones"));
 
         btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarActionPerformed(evt);
+            }
+        });
 
         btnEditar.setText("Editar");
 
@@ -136,7 +145,7 @@ public class Principal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pnlLista.setBorder(javax.swing.BorderFactory.createTitledBorder("Lista")); // NOI18N
+        pnlLista.setBorder(javax.swing.BorderFactory.createTitledBorder("Lista"));
 
         tblLista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -191,6 +200,10 @@ public class Principal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        agregarRegistro();
+    }//GEN-LAST:event_btnAgregarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -235,6 +248,7 @@ public class Principal extends javax.swing.JFrame {
 
             Object[] persona = new Object[3];
             model = (DefaultTableModel) tblLista.getModel();
+            model.setRowCount(0);
 
             while (rs.next()) {
                 persona[0] = rs.getInt("id");
@@ -245,6 +259,29 @@ public class Principal extends javax.swing.JFrame {
 
             tblLista.setModel(model);
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "ERROR: " + e.getMessage());
+        }
+    }
+
+    private void agregarRegistro() {
+        String dni = txtDni.getText();
+        String nombres = txtNombres.getText();
+
+        if (dni.equals("") || nombres.equals("")) {
+            JOptionPane.showMessageDialog(null, "Las cajas estan vacias...!!");
+        } else {
+            String sql = "INSERT INTO persona(dni, nombres) VALUES('" + dni + "', '" + nombres + "')";
+
+            try {
+                cn = conexion.getConnection();
+                st = cn.createStatement();
+                st.executeUpdate(sql);
+
+                JOptionPane.showMessageDialog(null, "Usuario agregado");
+                cargarRegistros();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "ERROR: " + e.getMessage());
+            }
         }
     }
 
